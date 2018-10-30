@@ -1,11 +1,6 @@
 # MyPic
 相册（有序的选择图片）
 
-<img src="https://github.com/FriendLin/MyPic/blob/master/a1.jpg" width="240" height="400" alt="图片加载失败"/>
-<img src="https://github.com/FriendLin/MyPic/blob/master/a2.jpg" width="240" height="400" alt="图片加载失败"/>
-<img src="https://github.com/FriendLin/MyPic/blob/master/a3.jpg" width="240" height="400" alt="图片加载失败"/>
-<img src="https://github.com/FriendLin/MyPic/blob/master/a4.jpg" width="240" height="400" alt="图片加载失败"/>
-
 # 1.需要添加的项目依赖 
 ```
  //recyclerview
