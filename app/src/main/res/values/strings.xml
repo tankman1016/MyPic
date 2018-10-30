@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">MyPic</string>
+
+    <string name="album">相册</string>
+    <string name="take_photo">拍照</string>
+    <string name="pic">图片</string>
+
+    <string name="pic_info">图片详情信息</string>
+
+</resources>
