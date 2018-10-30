@@ -1,7 +1,8 @@
 # MyPic
-相册（有序的选择图片）
+# 相册（有序的选择图片）
 
-
+<img src="https://github.com/FriendLin/MyPic/blob/master/b1.jpg" width="750" alt="" />
+<img src="https://github.com/FriendLin/MyPic/blob/master/b2.jpg" width="750" alt="" />
 
 # 1.需要添加的项目依赖 
 ```
