@@ -17,6 +17,8 @@ import com.wei.mypic.bean.LocalPicBean;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * 图片预览页
@@ -63,11 +65,21 @@ public class LookImgAty extends AppCompatActivity {
         findViewById(R.id.iv_back).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
+                //反馈给上一页新的选中状态
+                feedbackLast(false);
             }
         });
 
         viewPager = findViewById(R.id.viewPager);
+
+        //对图片进行排序
+        Collections.sort(localPicBeans, new Comparator<LocalPicBean>() {
+            @Override
+            public int compare(LocalPicBean o1, LocalPicBean o2) {
+                return o1.getSelectedSign() - o2.getSelectedSign();
+            }
+        });
+
         viewPager.setAdapter(new LookImgAdapter(this, localPicBeans));
         viewPager.setCurrentItem(selectedPos);
         //从开始显示位置1
@@ -82,26 +94,7 @@ public class LookImgAty extends AppCompatActivity {
         tv_finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                ArrayList<LocalPicBean> lookLocalPicBeans = new ArrayList<>();
-
-                for (int i = 0; i < localPicBeans.size(); i++) {
-                    if (localPicBeans.get(i).isSelected()) {
-                        lookLocalPicBeans.add(localPicBeans.get(i));
-                    }
-                }
-
-                if (lookLocalPicBeans.size() > 0) {
-                    Log.v("Lin2", "选择图片的大小：" + lookLocalPicBeans.size());
-                    Intent intent = new Intent();
-                    intent.putParcelableArrayListExtra("list", lookLocalPicBeans);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    Log.v("Lin2", "选择图片的大小：为0");
-                    Log.v("Lin2", "选择图片的大小：" + lookLocalPicBeans.size());
-                    finish();
-                }
+                feedbackLast(true);
             }
         });
 
@@ -141,9 +134,36 @@ public class LookImgAty extends AppCompatActivity {
                 if (localPicBeans.get(viewPager.getCurrentItem()).isSelected()) {
                     localPicBeans.get(viewPager.getCurrentItem()).setSelected(false);
                     tv_selected.setText("未选中");
+                    //取消选中并改变已选中的标记 比当前大的标记-1 比当前小的标记不做处理
+                    for (int i = 0; i < localPicBeans.size(); i++) {
+                        if (localPicBeans.get(i).isSelected()) {
+                            if (localPicBeans.get(i).getSelectedSign() > localPicBeans.get(viewPager.getCurrentItem()).getSelectedSign()) {
+                                localPicBeans.get(i).setSelectedSign(localPicBeans.get(i).getSelectedSign() - 1);
+                            }
+                        }
+                    }
+
                 } else {
                     localPicBeans.get(viewPager.getCurrentItem()).setSelected(true);
                     tv_selected.setText("选中了");
+                    //当前位置之前 选中的数量
+                    int selectNum = 0;
+                    //重新被选中,重新设置其和比其大的sign
+                    for (int i = 0; i < localPicBeans.size(); i++) {
+                        if (i < viewPager.getCurrentItem()) {
+                            if (localPicBeans.get(i).isSelected()) {
+                                selectNum = selectNum + 1;
+                            }
+                        } else {
+                            if (localPicBeans.get(i).isSelected()) {
+                                selectNum = selectNum + 1;
+                                localPicBeans.get(i).setSelectedSign(selectNum);
+                            }
+                        }
+
+                    }
+
+
                 }
                 handleSelectedSize();
 
@@ -184,5 +204,34 @@ public class LookImgAty extends AppCompatActivity {
             }
         }
         tv_finish.setText("完成(" + size + "/" + selectImgNumber + ")");
+    }
+
+    /**
+     * 反馈给上一页
+     *
+     * @param onClickCompleted 是否点击的完成
+     */
+    private void feedbackLast(boolean onClickCompleted) {
+        ArrayList<LocalPicBean> lookLocalPicBeans = new ArrayList<>();
+
+        for (int i = 0; i < localPicBeans.size(); i++) {
+            if (localPicBeans.get(i).isSelected()) {
+                lookLocalPicBeans.add(localPicBeans.get(i));
+            }
+        }
+
+        if (lookLocalPicBeans.size() > 0) {
+            Log.v("Lin2", "选择图片的大小：" + lookLocalPicBeans.size());
+            Intent intent = new Intent();
+            //是不是点击了完成
+            intent.putExtra("OnClickCompleted", onClickCompleted);
+            intent.putParcelableArrayListExtra("list", lookLocalPicBeans);
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            Log.v("Lin2", "选择图片的大小：为0");
+            Log.v("Lin2", "选择图片的大小：" + lookLocalPicBeans.size());
+            finish();
+        }
     }
 }

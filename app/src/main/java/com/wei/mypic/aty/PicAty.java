@@ -160,6 +160,7 @@ public class PicAty extends AppCompatActivity {
                     }
                     tv_img_size.setText("完成(" + selectNum + "/" + selectImgNumber + ")");
                 }
+                //最后数据更新
                 picAdapter.notifyDataSetChanged();
             }
         });
@@ -223,10 +224,31 @@ public class PicAty extends AppCompatActivity {
         if (requestCode == 1002 && resultCode == RESULT_OK) {
             if (data != null) {
                 Log.v("Lin2", "pic收到的反馈:data!=null");
-                Intent intent = new Intent();
-                intent.putParcelableArrayListExtra("list", data.getParcelableArrayListExtra("list"));
-                setResult(RESULT_OK, intent);
-                finish();
+                if (data.getBooleanExtra("OnClickCompleted", false)) {
+                    Intent intent = new Intent();
+                    intent.putParcelableArrayListExtra("list", data.getParcelableArrayListExtra("list"));
+                    setResult(RESULT_OK, intent);
+                    finish();
+                } else {
+                    //刷新选中的状态
+                    List<LocalPicBean> lookListSelected = data.getParcelableArrayListExtra("list");
+
+                    for (int i = 0; i < picAdapter.getItemCount(); i++) {
+                        //全部设置为未选中状态
+                        picAdapter.getLocalPicBeans().get(i).setSelected(false);
+                        for (int j = 0; j < lookListSelected.size(); j++) {
+                            //路径相同则判断为同一图片
+                            if (picAdapter.getLocalPicBeans().get(i).getImgPath().equals(lookListSelected.get(j).getImgPath())) {
+                                picAdapter.getLocalPicBeans().get(i).setSelected(true);
+                                picAdapter.getLocalPicBeans().get(i).setSelectedSign(lookListSelected.get(j).getSelectedSign());
+                            }
+                        }
+
+                    }
+
+                    picAdapter.notifyDataSetChanged();
+                    tv_img_size.setText("完成(" + picAdapter.getItemCount() + "/" + selectImgNumber + ")");
+                }
             } else {
                 Log.v("Lin2", "pic收到的反馈:data=null");
             }
@@ -275,7 +297,7 @@ public class PicAty extends AppCompatActivity {
             popupWindow.dismiss();
             return;
         }
-        popupWindow.showAsDropDown(v, 0, -SizeUtil.dp2px(this,200), Gravity.TOP);
+        popupWindow.showAsDropDown(v, 0, -SizeUtil.dp2px(this, 200), Gravity.TOP);
         isShowPopupWindow = true;
     }
 
@@ -334,17 +356,17 @@ public class PicAty extends AppCompatActivity {
         recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
-    //获取view的宽 高
-    public int[] getDisplayViewSize(View view) {
-        int size[] = new int[2];
-        int width = View.MeasureSpec.makeMeasureSpec(0,
-                View.MeasureSpec.UNSPECIFIED);
-        int height = View.MeasureSpec.makeMeasureSpec(0,
-                View.MeasureSpec.UNSPECIFIED);
-        view.measure(width, height);
-        size[0] = view.getMeasuredWidth();
-        size[1] = view.getMeasuredHeight();
-        return size;
-    }
+//    //获取view的宽 高
+//    public int[] getDisplayViewSize(View view) {
+//        int size[] = new int[2];
+//        int width = View.MeasureSpec.makeMeasureSpec(0,
+//                View.MeasureSpec.UNSPECIFIED);
+//        int height = View.MeasureSpec.makeMeasureSpec(0,
+//                View.MeasureSpec.UNSPECIFIED);
+//        view.measure(width, height);
+//        size[0] = view.getMeasuredWidth();
+//        size[1] = view.getMeasuredHeight();
+//        return size;
+//    }
 
 }
